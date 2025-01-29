@@ -7,10 +7,11 @@ namespace MovieForum2.Models
         // Primary Key
         [Key]
         public int CommentId { get; set; }
-        public string Content { get; set; }
-        public DateTime CreatedDate { get; set; } = DateTime.Now;
+        public string Content { get; set; } = string.Empty;
+        public DateTime CreateDate { get; set; } = DateTime.Now;
         // Foreign Key
         public int discussionId { get; set; }
-        public Discussion Discussion { get; set; }
+        // Nav Property
+        public Discussion? Discussion { get; set; }
     }
 }

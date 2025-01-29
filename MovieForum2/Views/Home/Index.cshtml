@@ -1,7 +1,25 @@
-﻿@{
+﻿@model List<MovieForum2.Models.Discussion>
+
+@{
     ViewData["Title"] = "Home Page";
 }
 
-<div class="text-center">
-    
+<h1>All Discussions</h1>
+
+<div class="mb-4">
+    Discuss your favourite movies of your favourite genres.<br/>
+</div>
+
+<div class="masonry-grid">
+    @foreach(var item in Model)
+    {
+        string imageUrl = Url.Content("/images/" + item.ImageFilename);
+
+        <div class="masonry-grid-item">
+            <a href="@Url.Action("Details", "Discussion", new { IDataTokensMetadata = item.DiscussionId})">
+                <img src="imageUrl" class="img-fluid"/>
+            </a>
+        </div>
+    }
+    <a asp-controller="Discussion" asp-action="Create">Create a new discussion</a>
 </div>

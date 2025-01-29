@@ -56,10 +56,24 @@ namespace MovieForum2.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("DiscussionId,Title,Content,ImageFilename")] Discussion discussion)
         {
+            discussion.CreateDate = DateTime.Now;
+
+            discussion.ImageFilename = Guid.NewGuid().ToString() + Path.GetExtension(discussion.ImageFile?.FileName);
+
             if (ModelState.IsValid)
             {
                 _context.Add(discussion);
                 await _context.SaveChangesAsync();
+
+                if (discussion.ImageFile != null)
+                {
+                    string filePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "images", discussion.ImageFilename);
+
+                    using(var fileStream = new FileStream(filePath, FileMode.Create))
+                    {
+                        await discussion.ImageFile.CopyToAsync(fileStream);
+                    }
+                }
                 return RedirectToAction(nameof(Index));
             }
             return View(discussion);
