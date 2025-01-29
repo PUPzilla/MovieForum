@@ -11,12 +11,12 @@
 </div>
 
 <div class="masonry-grid">
-    @foreach(var item in Model)
+    @foreach (var item in Model)
     {
         string imageUrl = Url.Content("/images/" + item.ImageFilename);
-
+        <h2>@item.Title</h2><br/>
         <div class="masonry-grid-item">
-            <a href="@Url.Action("Details", "Discussion", new { IDataTokensMetadata = item.DiscussionId})">
+            <a href="@Url.Action("Details", "Discussion", new { id = item.DiscussionId})">
                 <img src="imageUrl" class="img-fluid"/>
             </a>
         </div>

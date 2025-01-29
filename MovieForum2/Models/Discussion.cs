@@ -11,11 +11,12 @@ namespace MovieForum2.Models
         public string Title { get; set; } = string.Empty;
         public string Content { get; set; } = string.Empty;
         public string? ImageFilename { get; set; }
+        // Property for image file uploads
         [NotMapped]
         [Display(Name = "Image")]
         public IFormFile? ImageFile { get; set; }
         public DateTime CreateDate { get; set; } = DateTime.Now;
         // Nav Property
-        public List<Comment?> Comments { get; set; }
+        public List<Comment>? Comments { get; set; }
     }
 }

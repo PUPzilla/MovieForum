@@ -1,0 +1,22 @@
+﻿@model MovieForum2.Models.Discussion
+
+@{
+    ViewData["Title"] = Model.Title;
+}
+
+<table class="table">
+    <tr>
+        <td>
+            @Html.DisplayNameFor(model => model.Title)
+        </td>
+        <td>
+            @Html.DisplayFor(model => model.Title)
+        </td>
+        <td>
+            @Html.DisplayNameFor(model => model.ImageFilename)
+        </td>
+        <td>
+            @Html.DisplayFor(model => model.ImageFilename)
+        </td>
+    </tr>
+</table>
