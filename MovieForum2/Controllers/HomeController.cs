@@ -1,21 +1,34 @@
 using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using MovieForum2.Data;
 using MovieForum2.Models;
 
 namespace MovieForum2.Controllers
 {
     public class HomeController : Controller
     {
-        private readonly ILogger<HomeController> _logger;
+        private readonly MovieForum2Context _context;
 
-        public HomeController(ILogger<HomeController> logger)
+        public HomeController(MovieForum2Context context)
         {
-            _logger = logger;
+            _context = context;
         }
 
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
-            return View();
+            // Get all discussions
+            var discussions = await _context.Discussion.ToListAsync();
+
+            return View(discussions);
+        }
+
+        public async Task<IActionResult> DiscussionImage(int id)
+        {
+            // Get by ID
+            var image = await _context.Discussion.FirstOrDefaultAsync(m => m.DiscussionId == id);
+
+            return View(image);
         }
 
         public IActionResult Privacy()

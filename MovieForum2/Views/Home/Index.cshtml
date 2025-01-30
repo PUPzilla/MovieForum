@@ -16,10 +16,10 @@
         string imageUrl = Url.Content("/images/" + item.ImageFilename);
         <h2>@item.Title</h2><br/>
         <div class="masonry-grid-item">
-            <a href="@Url.Action("Details", "Discussion", new { id = item.DiscussionId})">
+            <a href="@Url.Action("Details", "Discussions", new { id = item.DiscussionId})">
                 <img src="imageUrl" class="img-fluid"/>
             </a>
         </div>
     }
-    <a asp-controller="Discussion" asp-action="Create">Create a new discussion</a>
+    <a asp-controller="Discussions" asp-action="Create">Create a new discussion</a>
 </div>

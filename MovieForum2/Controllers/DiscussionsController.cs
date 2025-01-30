@@ -22,7 +22,9 @@ namespace MovieForum2.Controllers
         // GET: Discussions
         public async Task<IActionResult> Index()
         {
-            return View(await _context.Discussion.ToListAsync());
+            var discussions = await _context.Discussion.ToListAsync();
+
+            return View(discussions);
         }
 
         // GET: Discussions/Details/5
@@ -54,8 +56,9 @@ namespace MovieForum2.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("DiscussionId,Title,Content,ImageFilename")] Discussion discussion)
+        public async Task<IActionResult> Create([Bind("DiscussionId,Title,Content,ImageFile")] Discussion discussion)
         {
+            // Initialize datetime prop
             discussion.CreateDate = DateTime.Now;
 
             discussion.ImageFilename = Guid.NewGuid().ToString() + Path.GetExtension(discussion.ImageFile?.FileName);
@@ -65,6 +68,7 @@ namespace MovieForum2.Controllers
                 _context.Add(discussion);
                 await _context.SaveChangesAsync();
 
+                // Save the file after the photo is saved in the DB
                 if (discussion.ImageFile != null)
                 {
                     string filePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "images", discussion.ImageFilename);
@@ -87,7 +91,8 @@ namespace MovieForum2.Controllers
                 return NotFound();
             }
 
-            var discussion = await _context.Discussion.FindAsync(id);
+            var discussion = await _context.Discussion.Include("Comments").FirstOrDefaultAsync(m => m.DiscussionId == id);
+
             if (discussion == null)
             {
                 return NotFound();
