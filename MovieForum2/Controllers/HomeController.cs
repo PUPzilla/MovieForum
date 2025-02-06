@@ -23,12 +23,22 @@ namespace MovieForum2.Controllers
             return View(discussions);
         }
 
-        public async Task<IActionResult> DiscussionImage(int id)
+        public async Task<IActionResult> DiscussionImage(int? id)
         {
-            // Get by ID
-            var image = await _context.Discussion.FirstOrDefaultAsync(m => m.DiscussionId == id);
+            if (id == null)
+            {
+                return NotFound();
+            }
 
-            return View(image);
+            var discussion = await _context.Discussion
+                .FirstOrDefaultAsync(m => m.DiscussionId == id);
+            if (discussion == null)
+            {
+                return NotFound();
+            }
+
+
+            return View(discussion);
         }
 
         public IActionResult Privacy()

@@ -168,6 +168,13 @@ namespace MovieForum2.Controllers
             return RedirectToAction(nameof(Index));
         }
 
+        public async Task<IActionResult> HomePage()
+        {
+            var discussions = await _context.Discussion.ToListAsync();
+
+            return View(discussions);
+        }
+
         private bool DiscussionExists(int id)
         {
             return _context.Discussion.Any(e => e.DiscussionId == id);

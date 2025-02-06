@@ -9,18 +9,40 @@
 <div class="mb-4">
     Discuss your favourite movies of your favourite genres.<br/>
 </div>
-<a asp-controller="Discussions" asp-action="Create">Create a new discussion</a>
 
 <div class="masonry-grid">
     @foreach (var item in Model)
     {
         string imageUrl = Url.Content("/images/" + item.ImageFilename);
+        string uniqueId = "image-" + item.DiscussionId;
 
-        <div class="masonry-grid-item">
-            <a href="@Url.Action("DiscussionImage", "Home", new { id = item.DiscussionId})">
-                <h2 >@item.Title</h2>
-                <img src="@imageUrl" class="img-fluid"/>
-            </a>
-        </div>
+            <div class="masonry-grid-item">
+                <a href="@Url.Action("DiscussionImage", "Home", new { id = item.DiscussionId})">
+                    <div class="container" 
+                        onmouseenter="showOverlay('@uniqueId')" 
+                        onmouseleave="hideOverlay('@uniqueId')">
+
+                        <img id="@uniqueId" src="@imageUrl" class="img-fluid" alt="@item.Content"/>
+                        <div class="overlay">
+                            <div class="text">@item.Title</div>
+                        </div>
+                    </div>
+                </a>
+                    <body style=@("text-align: center")>Number of comments:<br/>@(item.Comments != null ? item.Comments.Count : 0)<br/>Discussion created:<br/>@item.CreateDate</body>
+            </div>
     }
 </div>
+
+@{
+    /* Function ensures when hovering over an img only that image's overlay shows */
+}
+<script>
+    function showOverlay(id) {
+        document.querySelectorAll('.overlay').forEach(overlay => overlay.classList.remove('active'));
+        document.getElementById(id).nextElementSibling.classList.add('active');
+    }
+
+    function hideOverlay(id) {
+        document.getElementById(id).nextElementSibling.classList.remove('active');
+    }
+</script>
