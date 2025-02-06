@@ -13,7 +13,7 @@ namespace MovieForum2.Models
         public string ImageFilename { get; set; } = string.Empty;
         // Property for image file uploads
         [NotMapped]
-        [Display(Name = "images")]
+        [Display(Name = "Image")]
         public IFormFile? ImageFile { get; set; }
         public DateTime CreateDate { get; set; } = DateTime.Now;
         // Nav Property

@@ -5,7 +5,6 @@
 }
 
 <h1>Index</h1>
-
 <p>
     <a asp-action="Create">Create New</a>
 </p>
@@ -13,35 +12,46 @@
     <thead>
         <tr>
             <th>
-                @Html.DisplayNameFor(model => model.Title)
+                @{<i class="fa-solid fa-" />}
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Content)
+                @Html.DisplayNameFor(Model => Model.Title)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.ImageFilename)
+                @{<i class="fa-solid fa-camera-film" />}
             </th>
-            <th></th>
+            <th>
+                @{<i class="fa-circle-info" />}
+            </th>
+            <th>
+
+            </th>
         </tr>
     </thead>
     <tbody>
 @foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.Title)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Content)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.ImageFilename)
-            </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.DiscussionId">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.DiscussionId">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.DiscussionId">Delete</a>
-            </td>
-        </tr>
+
+    string imageUrl = Url.Content("/images/" + item.ImageFilename);
+
+    <tr>
+        <td>
+            @Html.DisplayFor(modelItem => item.Title)
+        </td>
+        <td>
+            <img src="@imageUrl" class="image-fluid thumbnail" />
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.Content)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.ImageFilename)
+        </td>
+        <td>
+            <a asp-action="Edit" asp-route-id="@item.DiscussionId">Edit</a> |
+            <a asp-action="Details" asp-route-id="@item.DiscussionId">Details</a> |
+            <a asp-action="Delete" asp-route-id="@item.DiscussionId">Delete</a>
+        </td>
+    </tr>
 }
     </tbody>
 </table>

@@ -1,3 +1,38 @@
+.thumbnail {
+    width: 100px;
+    height: auto;
+}
+/* Home page styles */
+.masonry-grid {
+    column-count: 3;
+    column-gap: 1.5em;
+}
+
+.masonry-grid-item {
+    display: inline-block;
+    margin: 0 0 2em;
+    width: 100%;
+}
+
+    .masonry-grid-item img:hover {
+        filter: brightness(0.65);
+        cursor: pointer;
+    }
+
+/* collapse grid to 2 columns */
+@media (max-width: 992px) {
+    .masonry-grid {
+        column-count: 2;
+    }
+}
+
+/* collapse grid to 1 column */
+@media (max-width: 768px) {
+    .masonry-grid {
+        column-count: 1;
+    }
+}
+
 html {
   font-size: 14px;
 }
