@@ -17,7 +17,7 @@
         string uniqueId = "image-" + item.DiscussionId;
 
             <div class="masonry-grid-item">
-                <a href="@Url.Action("DiscussionImage", "Home", new { id = item.DiscussionId})">
+                <a href="@Url.Action("GetDiscussion", "Home", new { id = item.DiscussionId})">
                     <div class="container" 
                         onmouseenter="showOverlay('@uniqueId')" 
                         onmouseleave="hideOverlay('@uniqueId')">
@@ -28,7 +28,7 @@
                         </div>
                     </div>
                 </a>
-                    <body style=@("text-align: center")>Number of comments:<br/>@(item.Comments != null ? item.Comments.Count : 0)<br/>Discussion created:<br/>@item.CreateDate</body>
+                    <body style=@("text-align: center")>Number of comments:<br/>@(item.Comments != null ? item.Comments.Count() : 0)<br/>Discussion created:<br/>@item.CreateDate</body>
             </div>
     }
 </div>

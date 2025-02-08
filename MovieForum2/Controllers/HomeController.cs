@@ -18,25 +18,23 @@ namespace MovieForum2.Controllers
         public async Task<IActionResult> Index()
         {
             // Get all discussions
-            var discussions = await _context.Discussion.ToListAsync();
+            var discussions = await _context.Discussion
+                .Include(d => d.Comments)
+                .ToListAsync();
 
             return View(discussions);
         }
 
-        public async Task<IActionResult> DiscussionImage(int? id)
+        public async Task<IActionResult> GetDiscussion(int id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
             var discussion = await _context.Discussion
+                .Include(d => d.Comments)
                 .FirstOrDefaultAsync(m => m.DiscussionId == id);
+            
             if (discussion == null)
             {
                 return NotFound();
             }
-
 
             return View(discussion);
         }

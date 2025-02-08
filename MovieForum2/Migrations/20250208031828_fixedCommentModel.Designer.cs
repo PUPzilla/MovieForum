@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using MovieForum2.Data;
 
@@ -11,9 +12,11 @@ using MovieForum2.Data;
 namespace MovieForum2.Migrations
 {
     [DbContext(typeof(MovieForum2Context))]
-    partial class MovieForum2ContextModelSnapshot : ModelSnapshot
+    [Migration("20250208031828_fixedCommentModel")]
+    partial class fixedCommentModel
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

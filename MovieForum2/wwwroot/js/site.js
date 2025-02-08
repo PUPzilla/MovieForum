@@ -3,14 +3,16 @@
     const icon = document.getElementById("darkModeIcon");
     const body = document.body;
 
-    function updateIconColor() {
+    function updateIconColor() {    
         icon.style.color = body.classList.contains("dark-mode") ? "white" : "black";
     }
 
     // Check if dark mode was previously enabled
     if (localStorage.getItem("darkMode") === "enabled") {
         body.classList.add("dark-mode");
-        icon.classList.replace("fa-moon", "fa-sun"); // Change to sun icon
+
+        // Change to sun icon
+        icon.classList.replace("fa-moon", "fa-sun");
         updateIconColor();
     }
 
@@ -19,10 +21,12 @@
 
         if (body.classList.contains("dark-mode")) {
             localStorage.setItem("darkMode", "enabled");
-            icon.classList.replace("fa-moon", "fa-sun"); // Change to sun
+            // Change to sun icon
+            icon.classList.replace("fa-moon", "fa-sun");
         } else {
             localStorage.setItem("darkMode", "disabled");
-            icon.classList.replace("fa-sun", "fa-moon"); // Change to moon
+            // Change to moon icon
+            icon.classList.replace("fa-sun", "fa-moon");
         }
 
         updateIconColor();

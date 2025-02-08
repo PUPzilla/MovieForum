@@ -20,10 +20,20 @@ namespace MovieForum2.Controllers
         }
 
         // GET: Comments/Create
-        public IActionResult Create()
+        public IActionResult Create(int DiscussionId)
         {
-            ViewData["discussionId"] = new SelectList(_context.Discussion, "DiscussionId", "DiscussionId");
-            return View();
+            var discussion = _context.Discussion
+                .FirstOrDefault(d => d.DiscussionId == DiscussionId);
+
+            if (discussion == null)
+            {
+                return NotFound();
+            }
+
+            var comment = new Comment { DiscussionId = DiscussionId };
+
+            ViewBag.DiscussionTitle = discussion.Title;
+            return View(comment);
         }
 
         // POST: Comments/Create
@@ -31,15 +41,31 @@ namespace MovieForum2.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("CommentId,Content,CreatedDate,discussionId")] Comment comment)
+        public async Task<IActionResult> Create([Bind("CommentId,Content,CreatedDate,DiscussionId")] Comment comment)
         {
+            if (!_context.Discussion.Any(d => d.DiscussionId == comment.DiscussionId))
+            {
+                ModelState.AddModelError("DiscussionId", "Invalid Discussion ID.");
+                ViewBag.DiscussionTitle = await _context.Discussion
+                    .Where(d => d.DiscussionId == comment.DiscussionId)
+                    .Select(d => d.Title)
+                    .FirstOrDefaultAsync();
+
+                return View(comment);
+            }
+
             if (ModelState.IsValid)
             {
                 _context.Add(comment);
                 await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                return RedirectToAction("GetDiscussion", "Home", new { id = comment.DiscussionId });
             }
-            ViewData["discussionId"] = new SelectList(_context.Discussion, "DiscussionId", "DiscussionId", comment.discussionId);
+
+            ViewBag.DiscussionTitle = await _context.Discussion
+                .Where(d => d.DiscussionId == comment.DiscussionId)
+                .Select(d => d.Title)
+                .FirstOrDefaultAsync();
+
             return View(comment);
         }
 

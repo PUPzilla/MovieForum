@@ -1,0 +1,41 @@
+﻿@model MovieForum2.Models.Discussion
+
+@{
+    ViewData["Title"] = "GetDiscussion";
+}
+
+<h1>@Model.Title</h1>
+<p>@Model.Content</p>
+
+<a asp-controller="Comments" asp-action="Create" asp-route-DiscussionId="@Model.DiscussionId">Add Comment</a>
+
+
+<h2>Comment Section</h2>
+
+@if (Model.Comments != null && Model.Comments.Any())
+{
+<table class="table">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Comment</th>
+            <th>Date</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach(var comment in Model.Comments.OrderByDescending(c => c.CreateDate))
+        {
+        <tr>
+            <td>@comment.CommentId</td>
+            <td>@comment.Content</td>
+            @{/* "g" displays Date (yyyy/mm/dd/) Time (hr/min) */}
+            <td>@comment.CreateDate.ToString("g")</td>
+        </tr>
+        }
+    </tbody>
+</table>
+}
+else
+{
+    <p>It's quiet... Too quiet...<br/>No comments have been made yet.</p>
+}
