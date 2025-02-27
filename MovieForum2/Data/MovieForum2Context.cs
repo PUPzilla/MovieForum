@@ -4,10 +4,12 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using MovieForum2.Models;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 
 namespace MovieForum2.Data
 {
-    public class MovieForum2Context : DbContext
+    public class MovieForum2Context : IdentityDbContext
     {
         public MovieForum2Context (DbContextOptions<MovieForum2Context> options) : base(options)
         {

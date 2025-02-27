@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using MovieForum2.Areas.Identity.Data;
 
 namespace MovieForum2.Models
 {
@@ -18,5 +19,9 @@ namespace MovieForum2.Models
         public DateTime CreateDate { get; set; } = DateTime.Now;
         // Nav Property
         public List<Comment>? Comments { get; set; }
+
+        public string ApplicationUserId { get; set; } = string.Empty;
+
+        public ApplicationUser? ApplicationUser { get; set; }
     }
 }

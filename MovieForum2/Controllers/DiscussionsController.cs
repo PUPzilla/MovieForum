@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -10,6 +11,7 @@ using MovieForum2.Models;
 
 namespace MovieForum2.Controllers
 {
+    [Authorize]
     public class DiscussionsController : Controller
     {
         private readonly MovieForum2Context _context;
@@ -105,7 +107,7 @@ namespace MovieForum2.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("DiscussionId,Title,Content,ImageFilename")] Discussion discussion)
+        public async Task<IActionResult> Edit(int id, [Bind("DiscussionId,Title,Content,CreateDate")] Discussion discussion)
         {
             if (id != discussion.DiscussionId)
             {

@@ -1,34 +1,27 @@
 ﻿document.addEventListener("DOMContentLoaded", function () {
-    const toggleButton = document.getElementById("darkModeToggle");
-    const icon = document.getElementById("darkModeIcon");
-    const body = document.body;
-
-    function updateIconColor() {    
-        icon.style.color = body.classList.contains("dark-mode") ? "white" : "black";
-    }
+    const darkModeToggle = document.getElementById("darkModeToggle");
+    const darkModeIcon = document.getElementById("darkModeIcon");
+    const html = document.documentElement; // Apply dark mode to <html>
 
     // Check if dark mode was previously enabled
     if (localStorage.getItem("darkMode") === "enabled") {
-        body.classList.add("dark-mode");
-
-        // Change to sun icon
-        icon.classList.replace("fa-moon", "fa-sun");
-        updateIconColor();
+        html.classList.add("dark-mode");
+        darkModeIcon.classList.replace("fa-moon", "fa-sun");
     }
 
-    toggleButton.addEventListener("click", function () {
-        body.classList.toggle("dark-mode");
+    darkModeToggle.addEventListener("click", function () {
+        // Add a short delay for smooth transition
+        setTimeout(() => {
+            html.classList.toggle("dark-mode");
 
-        if (body.classList.contains("dark-mode")) {
-            localStorage.setItem("darkMode", "enabled");
-            // Change to sun icon
-            icon.classList.replace("fa-moon", "fa-sun");
-        } else {
-            localStorage.setItem("darkMode", "disabled");
-            // Change to moon icon
-            icon.classList.replace("fa-sun", "fa-moon");
-        }
-
-        updateIconColor();
+            // Update icon based on mode
+            if (html.classList.contains("dark-mode")) {
+                darkModeIcon.classList.replace("fa-moon", "fa-sun");
+                localStorage.setItem("darkMode", "enabled"); // Save to localStorage
+            } else {
+                darkModeIcon.classList.replace("fa-sun", "fa-moon");
+                localStorage.setItem("darkMode", "disabled"); // Save to localStorage
+            }
+        }, 50); // Tiny delay for a better effect
     });
 });
