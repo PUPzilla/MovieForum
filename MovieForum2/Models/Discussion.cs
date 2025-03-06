@@ -1,6 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using MovieForum2.Areas.Identity.Data;
 
 namespace MovieForum2.Models
 {
@@ -9,9 +8,13 @@ namespace MovieForum2.Models
         // Primary Key
         [Key]
         public int DiscussionId { get; set; }
+
         public string Title { get; set; } = string.Empty;
+
         public string Content { get; set; } = string.Empty;
+
         public string ImageFilename { get; set; } = string.Empty;
+
         // Property for image file uploads
         [NotMapped]
         [Display(Name = "Image")]
@@ -20,8 +23,5 @@ namespace MovieForum2.Models
         // Nav Property
         public List<Comment>? Comments { get; set; }
 
-        public string ApplicationUserId { get; set; } = string.Empty;
-
-        public ApplicationUser? ApplicationUser { get; set; }
     }
 }

@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity;
 
-namespace MovieForum2.Areas.Identity.Data
+namespace MovieForum2.Data
 {
     public class ApplicationUser : IdentityUser
     {
@@ -8,12 +8,11 @@ namespace MovieForum2.Areas.Identity.Data
         public string Name { get; set; } = string.Empty;
 
         [PersonalData]
-        public string? Location { get; set; }
+        public string Location { get; set; } = string.Empty;
 
         //Profile Picture
         [PersonalData]
-        public string? ImageFilename { get; set; }
+        public string ImageFilename { get; set; } = string.Empty;
 
-        public IFormFile? ImageFile { get; set; }
     }
 }
