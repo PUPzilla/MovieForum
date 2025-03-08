@@ -1,22 +1,17 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using MovieForum2.Models;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 
 namespace MovieForum2.Data
 {
-    public class MovieForum2Context : IdentityDbContext
+    public class MovieForum2Context : IdentityDbContext<ApplicationUser>
     {
-        public MovieForum2Context (DbContextOptions<MovieForum2Context> options) : base(options)
+        public MovieForum2Context (DbContextOptions<MovieForum2Context> options) 
+            : base(options)
         {
-
         }
 
-        public DbSet<MovieForum2.Models.Discussion> Discussion { get; set; } = default!;
-        public DbSet<MovieForum2.Models.Comment> Comment { get; set; } = default!;
+        public DbSet<Discussion> Discussion { get; set; } = default!;
+        public DbSet<Comment> Comment { get; set; } = default!;
     }
 }

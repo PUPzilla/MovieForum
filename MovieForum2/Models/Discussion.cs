@@ -9,6 +9,7 @@ namespace MovieForum2.Models
         [Key]
         public int DiscussionId { get; set; }
 
+        [Required]
         public string Title { get; set; } = string.Empty;
 
         public string Content { get; set; } = string.Empty;
@@ -19,9 +20,15 @@ namespace MovieForum2.Models
         [NotMapped]
         [Display(Name = "Image")]
         public IFormFile? ImageFile { get; set; }
-        public DateTime CreateDate { get; set; } = DateTime.Now;
-        // Nav Property
-        public List<Comment>? Comments { get; set; }
 
+        public DateTime CreateDate { get; set; }
+
+        // Nav Property
+        public ICollection<Comment> Comments { get; set; } = new List<Comment>();
+
+        public Discussion()
+        {
+            CreateDate = DateTime.UtcNow;
+        }
     }
 }
