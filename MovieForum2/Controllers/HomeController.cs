@@ -42,7 +42,7 @@ namespace MovieForum2.Controllers
         public IActionResult Privacy()
         {
             return View();
-        }        
+        }
         
     }
 }

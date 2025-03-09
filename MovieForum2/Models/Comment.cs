@@ -1,20 +1,29 @@
-﻿using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
+﻿using MovieForum2.Data;
+using MovieForum2.Models;
+using System.ComponentModel.DataAnnotations;
 
 namespace MovieForum2.Models
 {
     public class Comment
     {
-        // Primary Key
         [Key]
         public int CommentId { get; set; }
+
         public string Content { get; set; } = string.Empty;
-        public DateTime CreateDate { get; set; } = DateTime.Now;
-        // Foreign Key
+
+        public DateTime CreateDate { get; set; } = DateTime.UtcNow;
+
+        // Foreign Key (User)
+        public string? ApplicationUserId { get; set; }
+
+        // Navigation Property
+        public ApplicationUser? ApplicationUser { get; set; }
+
+        // Foreign Key (Discussion)
         [Required]
-        [ForeignKey("Discussion")]
         public int DiscussionId { get; set; }
-        // Nav Property
+
         public Discussion? Discussion { get; set; }
     }
+
 }

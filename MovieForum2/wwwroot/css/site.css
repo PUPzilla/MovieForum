@@ -36,6 +36,13 @@ html, body,
             color: white;
         }
 
+        html.dark-mode #darkModeToggle:hover i {
+            color: black;
+            background-color: white;
+            border-radius: 50%; /* Optional: makes it look better */
+            transition: color 0.3s ease-in-out, background-color 0.3s ease-in-out;
+        }
+
         /* Ensure button border color changes smoothly */
         html.dark-mode .btn-outline-dark {
             color: white;
@@ -51,6 +58,14 @@ html, body,
         html.dark-mode .footer {
             background-color: dimgray;
             color: white;
+        }
+
+        html.dark-mode input,
+        html.dark-mode textarea,
+        html.dark-mode select {
+            background-color: black;
+            color: white;
+            border: 1px solid darkgray;
         }
 
 /* General Styles */
@@ -94,6 +109,18 @@ body {
     column-gap: 1.5em;
 }
 
+@media (max-width: 992px) {
+    .masonry-grid {
+        column-count: 2;
+    }
+}
+
+@media (max-width: 768px) {
+    .masonry-grid {
+        column-count: 1;
+    }
+}
+
 .masonry-grid-item {
     display: inline-block;
     width: 100%;
@@ -101,19 +128,72 @@ body {
     break-inside: avoid;
 }
 
-    .masonry-grid-item img {
+    .discussion-info {
+        margin: 0;
+        padding: 0.5em 0;
+        font-size: 14px;
+    }
+
+    .discussion-info p {
+        text-align: center;
+    }
+
+    .masonry-grid-item .container {
+        position: relative;
+        width: 100%;
+        height: 250px;
         border-style: outset;
         border-radius: 8px;
         border-width: 6px;
         border-color: lightgray;
-        transition: border-color 0.3s ease, filter 0.3s ease;
+        overflow: hidden;
+        padding: 0;
+        margin: 0;
     }
 
-        .masonry-grid-item img:hover {
-            filter: blur(4px);
-            cursor: pointer;
-            transition: 0.5s ease;
+    .masonry-grid-item img {
+        display: block;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        margin: 0;
+        padding: 0;
+        border: none;
+        transition: filter 0.3s ease-in-out transform 2s ease-in-out;
+        position: relative;
+        z-index: 0;
+    }
+
+    .masonry-grid-item .overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgb(0, 0, 0, 0.50);
+        opacity: 0;
+        transition: opacity 0.5s ease;
+        z-index: 1;
+    }
+
+        .masonry-grid-item .overlay .text {
+            color: white;
+            font-size: 20px;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            text-shadow: 1px 1px 2px black;
+            transform: translate(-50%, -50%);
         }
+
+    .masonry-grid-item:hover .overlay {
+        opacity: 1;
+    }
+
+    .masonry-grid-item:hover img {
+        filter: blur(4px) brightness(0.7);
+        transform: scale(1.05);
+    }
 
 /* Responsive Grid */
 @media (max-width: 992px) {
@@ -138,41 +218,5 @@ body {
 .image {
     display: block;
     width: 100%;
-    height: auto;
-}
-
-/* Overlay */
-.overlay {
-    position: absolute;
-    inset: 0;
-    width: 100%;
     height: 100%;
-    opacity: 0;
-    transition: opacity 0.5s ease, filter 0.5s ease;
-    filter: brightness(1);
-    pointer-events: none; /* Ensures it doesn't interfere when hidden */
-    will-change: opacity, filter;
-}
-
-    /* Show overlay when active */
-    .overlay.active {
-        filter: opacity(1);
-    }
-
-/* Overlay Text */
-.text {
-    color: white;
-    text-shadow: 1px 1px 2px black;
-    font-size: 24px;
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    text-align: center;
-    opacity: 0; /* Hidden by default */
-    transition: opacity 0.5s ease;
-}
-
-.overlay.active .text {
-    filter: opacity(1);
 }

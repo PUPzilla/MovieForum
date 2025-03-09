@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -15,16 +16,21 @@ namespace MovieForum2.Controllers
     public class DiscussionsController : Controller
     {
         private readonly MovieForum2Context _context;
+        private readonly UserManager<ApplicationUser> _userManager;
 
-        public DiscussionsController(MovieForum2Context context)
+        public DiscussionsController(MovieForum2Context context, UserManager<ApplicationUser> userManager)
         {
             _context = context;
+            _userManager = userManager;
         }
 
         // GET: Discussions
         public async Task<IActionResult> Index()
         {
-            var discussions = await _context.Discussion.ToListAsync();
+            List<Discussion> discussions = await _context.Discussion
+                .Include(m => m.Comments)
+                .Where(m => m.ApplicationUserId == _userManager.GetUserId(User))
+                .ToListAsync();
 
             return View(discussions);
         }
@@ -58,12 +64,23 @@ namespace MovieForum2.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("DiscussionId,Title,Content,ImageFile")] Discussion discussion)
+        public async Task<IActionResult> Create([Bind("DiscussionId,Title,Content,ImageFile,ApplicationUserId")] Discussion discussion)
         {
+            discussion.ApplicationUserId = _userManager.GetUserId(User);
+
+            if (discussion.ApplicationUserId == null)
+            {
+                ModelState.AddModelError("", "User must be logged in to create a new discussion.");
+                return View(discussion);
+            }
+
             // Initialize datetime prop
             discussion.CreateDate = DateTime.Now;
 
-            discussion.ImageFilename = Guid.NewGuid().ToString() + Path.GetExtension(discussion.ImageFile?.FileName);
+            if (discussion.ImageFile != null)
+            {
+                discussion.ImageFilename = Guid.NewGuid().ToString() + Path.GetExtension(discussion.ImageFile.FileName);
+            }
 
             if (ModelState.IsValid)
             {
@@ -75,10 +92,8 @@ namespace MovieForum2.Controllers
                 {
                     string filePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "images", discussion.ImageFilename);
 
-                    using(var fileStream = new FileStream(filePath, FileMode.Create))
-                    {
-                        await discussion.ImageFile.CopyToAsync(fileStream);
-                    }
+                    using var fileStream = new FileStream(filePath, FileMode.Create);
+                    await discussion.ImageFile.CopyToAsync(fileStream);
                 }
                 return RedirectToAction(nameof(Index));
             }
@@ -107,18 +122,40 @@ namespace MovieForum2.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("DiscussionId,Title,Content,CreateDate")] Discussion discussion)
+        public async Task<IActionResult> Edit(int id, [Bind("DiscussionId,Title,Content,CreateDate,ApplicationUserId,ImageFile")] Discussion discussion)
         {
             if (id != discussion.DiscussionId)
             {
                 return NotFound();
             }
 
+            var existingDiscussion = await _context.Discussion.FindAsync(id);
+
+            if (existingDiscussion == null)
+            {
+                return NotFound();
+            }
+
+            discussion.ApplicationUserId = existingDiscussion.ApplicationUserId;
+
+            if (discussion.ImageFile != null)
+            {
+                discussion.ImageFilename = Guid.NewGuid().ToString() + Path.GetExtension(discussion.ImageFile.FileName);
+
+                string filePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "images", discussion.ImageFilename);
+                using var fileStream = new FileStream(filePath, FileMode.Create);
+                await discussion.ImageFile.CopyToAsync(fileStream);
+            }
+            else
+            {
+                discussion.ImageFilename = existingDiscussion.ImageFilename;
+            }
+
             if (ModelState.IsValid)
             {
                 try
                 {
-                    _context.Update(discussion);
+                    _context.Entry(existingDiscussion).CurrentValues.SetValues(discussion);
                     await _context.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)

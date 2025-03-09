@@ -9,17 +9,18 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using MovieForum2.Data;
 
 namespace MovieForum2.Areas.Identity.Pages.Account.Manage
 {
     public class IndexModel : PageModel
     {
-        private readonly UserManager<IdentityUser> _userManager;
-        private readonly SignInManager<IdentityUser> _signInManager;
+        private readonly UserManager<ApplicationUser> _userManager;
+        private readonly SignInManager<ApplicationUser> _signInManager;
 
         public IndexModel(
-            UserManager<IdentityUser> userManager,
-            SignInManager<IdentityUser> signInManager)
+            UserManager<ApplicationUser> userManager,
+            SignInManager<ApplicationUser> signInManager)
         {
             _userManager = userManager;
             _signInManager = signInManager;
@@ -55,13 +56,35 @@ namespace MovieForum2.Areas.Identity.Pages.Account.Manage
             ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
             ///     directly from your code. This API may change or be removed in future releases.
             /// </summary>
+
+            [Required]
+            [DataType(DataType.Text)]
+            [Display(Name = "Name")]
+            public string Name { get; set; }
+
+            [Required]
+            [DataType(DataType.Text)]
+            [Display(Name = "Location")]
+            public string Location { get; set; }
+            
+            [DataType(DataType.ImageUrl)]
+            [Display(Name = "ImageFile")]
+            public IFormFile ImageFile { get; set; }
+
             [Phone]
             [Display(Name = "Phone number")]
             public string PhoneNumber { get; set; }
+
+            public string ImageFilename { get; set; } = string.Empty;
         }
 
-        private async Task LoadAsync(IdentityUser user)
+        private async Task LoadAsync(ApplicationUser user)
         {
+            if (user == null)
+            {
+                throw new InvalidOperationException("User is not logged in.");
+            }
+
             var userName = await _userManager.GetUserNameAsync(user);
             var phoneNumber = await _userManager.GetPhoneNumberAsync(user);
 
@@ -69,16 +92,26 @@ namespace MovieForum2.Areas.Identity.Pages.Account.Manage
 
             Input = new InputModel
             {
-                PhoneNumber = phoneNumber
+                Name = user.Name ?? string.Empty, // Avoid null values
+                Location = user.Location ?? string.Empty, // Avoid null values
+                ImageFilename = user.ImageFilename ?? string.Empty, // Avoid null values
+                ImageFile = user.ImageFile ?? null, // Prevent crash if ImageFile is null
+                PhoneNumber = phoneNumber ?? string.Empty // Avoid null values
             };
         }
 
         public async Task<IActionResult> OnGetAsync()
         {
             var user = await _userManager.GetUserAsync(User);
+
             if (user == null)
             {
                 return NotFound($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
+            }
+
+            if (user.ImageFile == null)
+            {
+                user.ImageFilename = string.Empty;
             }
 
             await LoadAsync(user);
@@ -108,6 +141,21 @@ namespace MovieForum2.Areas.Identity.Pages.Account.Manage
                     StatusMessage = "Unexpected error when trying to set phone number.";
                     return RedirectToPage();
                 }
+            }
+
+            if(Input.Name != user.Name)
+            {
+                user.Name = Input.Name;
+            }
+
+            if(Input.Location != user.Location)
+            {
+                user.Location = Input.Location;
+            }
+
+            if (Input.ImageFilename != user.ImageFilename && Input.ImageFilename != null)
+            {
+                user.ImageFilename = Input.ImageFilename;
             }
 
             await _signInManager.RefreshSignInAsync(user);

@@ -26,7 +26,6 @@
         @foreach(var comment in Model.Comments.OrderByDescending(c => c.CreateDate))
         {
         <tr>
-            <td>@comment.CommentId</td>
             <td>@comment.Content</td>
             @{/* "g" displays Date (yyyy/mm/dd/) Time (hr/min) */}
             <td>@comment.CreateDate.ToString("g")</td>

@@ -1,7 +1,6 @@
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
-using MovieForum2.Data;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
+using MovieForum2.Data;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -9,6 +8,8 @@ builder.Services.AddDbContext<MovieForum2Context>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("MovieForum2Context") ?? throw new InvalidOperationException("Connection string 'MovieForum2Context' not found.")));
 
 builder.Services.AddDefaultIdentity<ApplicationUser>(options => options.SignIn.RequireConfirmedAccount = false).AddEntityFrameworkStores<MovieForum2Context>();
+
+builder.Services.AddScoped<SignInManager<ApplicationUser>>();
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
