@@ -15,23 +15,23 @@
 
         string uniqueId = "image-" + item.DiscussionId;
 
-            <div class="masonry-grid-item">
-                <a href="@Url.Action("GetDiscussion", "Home", new { id = item.DiscussionId})">
-                    <div class="container" 
-                        onmouseenter="showOverlay('@uniqueId')" 
-                        onmouseleave="hideOverlay('@uniqueId')">
+        <div class="masonry-grid-item">
+            <a href="@Url.Action("GetDiscussion", "Home", new { id = item.DiscussionId})">
+                <div class="container" 
+                    onmouseenter="showOverlay('@uniqueId')" 
+                    onmouseleave="hideOverlay('@uniqueId')">
 
-                        <img id="@uniqueId" src="@imageUrl" class="img-fluid" alt="@item.Content"/>
-                        <div class="overlay">
-                            <div class="text">@item.Title</div>
-                        </div>
+                    <img id="@uniqueId" src="@imageUrl" class="img-fluid" alt="@item.Content"/>
+                    <div class="overlay">
+                        <div class="text">@item.Title</div>
                     </div>
-                </a>
-                <div class="discussion-info">
-                    <p class="text-center">Number of comments: @(item.Comments != null ? item.Comments.Count() : 0)</p>
-                    <p class="text-center">Discussion created: @item.CreateDate</p>
                 </div>
+            </a>
+            <div class="discussion-info">
+                <p class="text-center">Number of comments: @(item.Comments != null ? item.Comments.Count() : 0)</p>
+                <p class="text-center">Discussion created: @item.CreateDate</p>
             </div>
+        </div>
     }
 </div>
 

@@ -143,24 +143,53 @@ namespace MovieForum2.Areas.Identity.Pages.Account.Manage
                 }
             }
 
-            if(Input.Name != user.Name)
+            if (Input.Name != user.Name)
             {
                 user.Name = Input.Name;
             }
 
-            if(Input.Location != user.Location)
+            if (Input.Location != user.Location)
             {
                 user.Location = Input.Location;
             }
 
-            if (Input.ImageFilename != user.ImageFilename && Input.ImageFilename != null)
+            // Handle profile image upload
+            if (Input.ImageFile != null)
             {
-                user.ImageFilename = Input.ImageFilename;
+                if (!string.IsNullOrEmpty(user.ImageFilename))
+                {
+                    var oldImagePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "images", user.ImageFilename);
+                    if (System.IO.File.Exists(oldImagePath))
+                    {
+                        System.IO.File.Delete(oldImagePath);
+                    }
+                }
+
+                // Generate new image filename
+                user.ImageFilename = Guid.NewGuid().ToString() + Path.GetExtension(Input.ImageFile.FileName);
+                string filePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "images", user.ImageFilename);
+
+                using (var fileStream = new FileStream(filePath, FileMode.Create))
+                {
+                    await Input.ImageFile.CopyToAsync(fileStream);
+                }
             }
 
-            await _signInManager.RefreshSignInAsync(user);
-            StatusMessage = "Your profile has been updated";
-            return RedirectToPage();
+            // Update user in the database
+            var result = await _userManager.UpdateAsync(user);
+
+            if (result.Succeeded)
+            {
+                await _signInManager.RefreshSignInAsync(user);
+                StatusMessage = "Your profile has been updated";
+                return RedirectToPage();
+            }
+            else
+            {
+                StatusMessage = "Unexpected error when trying to update profile.";
+                return RedirectToPage();
+            }
         }
+
     }
 }

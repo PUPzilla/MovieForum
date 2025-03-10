@@ -27,9 +27,12 @@ namespace MovieForum2.Controllers
         // GET: Discussions
         public async Task<IActionResult> Index()
         {
-            List<Discussion> discussions = await _context.Discussion
+            var userId = _userManager.GetUserId(User);
+
+            var discussions = await _context.Discussion
                 .Include(m => m.Comments)
-                .Where(m => m.ApplicationUserId == _userManager.GetUserId(User))
+                .Where(m => m.ApplicationUserId == userId)
+                .OrderByDescending(d => d.CreateDate)
                 .ToListAsync();
 
             return View(discussions);
@@ -59,12 +62,9 @@ namespace MovieForum2.Controllers
             return View();
         }
 
-        // POST: Discussions/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("DiscussionId,Title,Content,ImageFile,ApplicationUserId")] Discussion discussion)
+        public async Task<IActionResult> Create([Bind("Title,Content,ImageFile")] Discussion discussion)
         {
             discussion.ApplicationUserId = _userManager.GetUserId(User);
 
@@ -74,30 +74,22 @@ namespace MovieForum2.Controllers
                 return View(discussion);
             }
 
-            // Initialize datetime prop
+            // Assign create date
             discussion.CreateDate = DateTime.Now;
 
             if (discussion.ImageFile != null)
             {
                 discussion.ImageFilename = Guid.NewGuid().ToString() + Path.GetExtension(discussion.ImageFile.FileName);
+                string filePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "images", discussion.ImageFilename);
+
+                using var fileStream = new FileStream(filePath, FileMode.Create);
+                await discussion.ImageFile.CopyToAsync(fileStream);
             }
 
-            if (ModelState.IsValid)
-            {
-                _context.Add(discussion);
-                await _context.SaveChangesAsync();
+            _context.Add(discussion);
+            await _context.SaveChangesAsync();
 
-                // Save the file after the photo is saved in the DB
-                if (discussion.ImageFile != null)
-                {
-                    string filePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "images", discussion.ImageFilename);
-
-                    using var fileStream = new FileStream(filePath, FileMode.Create);
-                    await discussion.ImageFile.CopyToAsync(fileStream);
-                }
-                return RedirectToAction(nameof(Index));
-            }
-            return View(discussion);
+            return RedirectToAction(nameof(Index));
         }
 
         // GET: Discussions/Edit/5
@@ -117,12 +109,9 @@ namespace MovieForum2.Controllers
             return View(discussion);
         }
 
-        // POST: Discussions/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("DiscussionId,Title,Content,CreateDate,ApplicationUserId,ImageFile")] Discussion discussion)
+        public async Task<IActionResult> Edit(int id, [Bind("DiscussionId,Title,Content,CreateDate,ImageFile,ApplicationUserId")] Discussion discussion)
         {
             if (id != discussion.DiscussionId)
             {
@@ -130,19 +119,17 @@ namespace MovieForum2.Controllers
             }
 
             var existingDiscussion = await _context.Discussion.FindAsync(id);
-
             if (existingDiscussion == null)
             {
                 return NotFound();
             }
 
-            discussion.ApplicationUserId = existingDiscussion.ApplicationUserId;
-
+            // Will keep the current image if user doesn't upload new file
             if (discussion.ImageFile != null)
             {
                 discussion.ImageFilename = Guid.NewGuid().ToString() + Path.GetExtension(discussion.ImageFile.FileName);
-
                 string filePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "images", discussion.ImageFilename);
+
                 using var fileStream = new FileStream(filePath, FileMode.Create);
                 await discussion.ImageFile.CopyToAsync(fileStream);
             }
@@ -151,27 +138,10 @@ namespace MovieForum2.Controllers
                 discussion.ImageFilename = existingDiscussion.ImageFilename;
             }
 
-            if (ModelState.IsValid)
-            {
-                try
-                {
-                    _context.Entry(existingDiscussion).CurrentValues.SetValues(discussion);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!DiscussionExists(discussion.DiscussionId))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
-                return RedirectToAction(nameof(Index));
-            }
-            return View(discussion);
+            _context.Entry(existingDiscussion).CurrentValues.SetValues(discussion);
+            await _context.SaveChangesAsync();
+
+            return RedirectToAction(nameof(Index));
         }
 
         // GET: Discussions/Delete/5
@@ -192,7 +162,6 @@ namespace MovieForum2.Controllers
             return View(discussion);
         }
 
-        // POST: Discussions/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
@@ -201,22 +170,10 @@ namespace MovieForum2.Controllers
             if (discussion != null)
             {
                 _context.Discussion.Remove(discussion);
+                await _context.SaveChangesAsync();
             }
 
-            await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
-        }
-
-        public async Task<IActionResult> HomePage()
-        {
-            var discussions = await _context.Discussion.ToListAsync();
-
-            return View(discussions);
-        }
-
-        private bool DiscussionExists(int id)
-        {
-            return _context.Discussion.Any(e => e.DiscussionId == id);
         }
     }
 }

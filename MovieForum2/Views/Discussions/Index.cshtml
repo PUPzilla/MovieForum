@@ -26,27 +26,27 @@
         </tr>
     </thead>
     <tbody>
-@foreach (var item in Model) {
+@foreach (var discussion in Model) {
 
-    string imageUrl = Url.Content("/images/" + item.ImageFilename);
+    string imageUrl = Url.Content("/images/" + discussion.ImageFilename);
 
     <tr>
         <td>
-            @Html.DisplayFor(modelItem => item.Title)
+            @Html.DisplayFor(modelItem => discussion.Title)
         </td>
         <td>
             <img src="@imageUrl" class="image-fluid thumbnail" />
         </td>
         <td>
-            @Html.DisplayFor(modelItem => item.Content)
+            @Html.DisplayFor(modelItem => discussion.Content)
         </td>
         <td>
-            @Html.DisplayFor(modelItem => item.ImageFilename)
+            @Html.DisplayFor(modelItem => discussion.ImageFilename)
         </td>
         <td>
-            <a asp-action="Edit" asp-route-id="@item.DiscussionId">Edit</a> |
-            <a asp-action="Details" asp-route-id="@item.DiscussionId">Details</a> |
-            <a asp-action="Delete" asp-route-id="@item.DiscussionId">Delete</a>
+            <a asp-action="Edit" asp-route-id="@discussion.DiscussionId">Edit</a> |
+            <a asp-action="Details" asp-route-id="@discussion.DiscussionId">Details</a> |
+            <a asp-action="Delete" asp-route-id="@discussion.DiscussionId">Delete</a>
         </td>
     </tr>
 }

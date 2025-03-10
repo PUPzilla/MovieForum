@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -13,10 +15,12 @@ namespace MovieForum2.Controllers
     public class CommentsController : Controller
     {
         private readonly MovieForum2Context _context;
+        private readonly UserManager<ApplicationUser> _userManager;
 
-        public CommentsController(MovieForum2Context context)
+        public CommentsController(MovieForum2Context context, UserManager<ApplicationUser> userManager)
         {
             _context = context;
+            _userManager = userManager;
         }
 
         // GET: Comments/Create
@@ -36,37 +40,24 @@ namespace MovieForum2.Controllers
             return View(comment);
         }
 
-        // POST: Comments/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("CommentId,Content,CreatedDate,DiscussionId")] Comment comment)
+        public async Task<IActionResult> Create(int discussionId, [Bind("Content")] Comment comment)
         {
-            if (!_context.Discussion.Any(d => d.DiscussionId == comment.DiscussionId))
+            var discussion = await _context.Discussion.FindAsync(discussionId);
+            if (discussion == null)
             {
-                ModelState.AddModelError("DiscussionId", "Invalid Discussion ID.");
-                ViewBag.DiscussionTitle = await _context.Discussion
-                    .Where(d => d.DiscussionId == comment.DiscussionId)
-                    .Select(d => d.Title)
-                    .FirstOrDefaultAsync();
-
-                return View(comment);
+                return NotFound();
             }
 
-            if (ModelState.IsValid)
-            {
-                _context.Add(comment);
-                await _context.SaveChangesAsync();
-                return RedirectToAction("GetDiscussion", "Home", new { id = comment.DiscussionId });
-            }
+            comment.DiscussionId = discussionId;
+            comment.ApplicationUserId = _userManager.GetUserId(User);
+            comment.CreateDate = DateTime.Now;
 
-            ViewBag.DiscussionTitle = await _context.Discussion
-                .Where(d => d.DiscussionId == comment.DiscussionId)
-                .Select(d => d.Title)
-                .FirstOrDefaultAsync();
+            _context.Add(comment);
+            await _context.SaveChangesAsync();
 
-            return View(comment);
+            return RedirectToAction("GetDiscussion", "Home", new { id = discussionId });
         }
 
         private bool CommentExists(int id)

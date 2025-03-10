@@ -4,28 +4,16 @@
     ViewData["Title"] = "Create Comment";
 }
 
-<h1>Create Comment</h1>
-<h3>Post to: @ViewBag.DiscussionTitle</h3>
+<h3>Post a comment to: @ViewBag.DiscussionTitle</h3>
 
 <hr />
-<div class="row">
-    <div class="col-md-4">
-        <form asp-action="Create">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <div class="form-group">
-                <label asp-for="Content" class="control-label"></label>
-                <input asp-for="Content" class="form-control" />
-                <span asp-validation-for="Content" class="text-danger"></span>
-            </div>
-            <div>
-                <input type="hidden" asp-for="DiscussionId" />
-                <div class="form-group">
-                    <input type="submit" value="Create" class="btn btn-primary" />
-                </div>
-            </div>
-        </form>
+<form asp-action="Create">
+    <div class="form-group">
+        <label asp-for="Content" class="control-label">Your Comment</label>
+        <textarea class="form-control" id="Content" name="Content" required></textarea>
     </div>
-</div>
+    <button type="submit" class="btn btn-primary">Post</button>
+</form>
 
 <div>
     <a asp-controller="Home" asp-action="GetDiscussion" asp-route-id="@Model.DiscussionId">Back to Discussion</a>
