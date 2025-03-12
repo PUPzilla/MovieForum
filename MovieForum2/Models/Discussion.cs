@@ -28,7 +28,7 @@ namespace MovieForum2.Models
         public string ApplicationUserId { get; set; } = string.Empty;
 
         // Nav Property
-        public ApplicationUser? ApplicationUser { get; set; }
+        public ApplicationUser ApplicationUser { get; set; }
 
         public ICollection<Comment> Comments { get; set; } = new List<Comment>();
 

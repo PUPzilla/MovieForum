@@ -62,10 +62,17 @@ html, body,
 
         html.dark-mode input,
         html.dark-mode textarea,
-        html.dark-mode select {
+        html.dark-mode select,
+        html.dark-mode container
+        html.dark-mode form-control
+        {
             background-color: black;
             color: white;
             border: 1px solid darkgray;
+        }
+
+        html.dark-mode .form-control:disabled {
+            color: black;
         }
 
 /* General Styles */
@@ -101,6 +108,20 @@ body {
 .thumbnail {
     width: 100px;
     height: auto;
+}
+
+.profile-picture {
+    width: 100%;
+    max-width: 200px;
+    height: auto;
+    border-radius: 100%;
+    object-fit: cover;
+}
+
+.pfp-small {
+    max-width: 50px;
+    max-height: 100%;
+    border-radius: 100%;
 }
 
 /* Masonry Grid */
@@ -210,12 +231,13 @@ body {
 
 /* Image Container with Overlay */
 .container {
+    background-color: transparent;
     position: relative;
     width: 100%;
     margin-bottom: 2em;
 }
 
-.image {
+.img-fluid {
     display: block;
     width: 100%;
     height: 100%;

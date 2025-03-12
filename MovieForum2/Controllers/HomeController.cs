@@ -1,4 +1,7 @@
 using System.Diagnostics;
+using System.Linq;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -9,26 +12,27 @@ namespace MovieForum2.Controllers
 {
     public class HomeController : Controller
     {
-        private readonly MovieForum2Context _context;
         private readonly UserManager<ApplicationUser> _userManager;
+        private readonly MovieForum2Context _context;
 
         public HomeController(MovieForum2Context context, UserManager<ApplicationUser> userManager)
         {
-            _context = context;
             _userManager = userManager;
+            _context = context;
         }
 
         // Display all discussions
         public async Task<IActionResult> Index()
-        {
-            // Get all discussions
+        {            
             var discussions = await _context.Discussion
                 .OrderByDescending(d => d.CreateDate)
+                .Include(d => d.ApplicationUser)
                 .Include(d => d.Comments)
                 .ToListAsync();
 
             return View(discussions);
         }
+
 
         public async Task<IActionResult> GetDiscussion(int? id)
         {
@@ -38,7 +42,9 @@ namespace MovieForum2.Controllers
             }
 
             var discussion = await _context.Discussion
+                .Include(d => d.ApplicationUser)
                 .Include(d => d.Comments)
+                    .ThenInclude(c => c.ApplicationUser)
                 .FirstOrDefaultAsync(m => m.DiscussionId == id);
 
             if (discussion == null)
@@ -51,35 +57,46 @@ namespace MovieForum2.Controllers
             return View(discussion);
         }
 
+        [Authorize]
         public async Task<IActionResult> Profile(string id)
         {
-            if (id == null)
+            if (string.IsNullOrEmpty(id))
             {
                 return NotFound();
             }
 
-            // Fetch the user by id
-            var user = await _userManager.FindByIdAsync(id);
+            // Retrieve user details
+            var user = await _userManager.Users
+                .Where(u => u.Id == id)
+                .Include(u => u.Discussions)
+                .Select(u => new ProfileView
+                {
+                    Id = u.Id,
+                    Name = u.Name,
+                    Location = u.Location,
+                    ProfilePicture = u.ImageFilename,
+                    DiscussionThreads = u.Discussions
+                        .OrderByDescending(d => d.CreateDate)
+                        .Select(d => new DiscussionThreadViewModel
+                        {
+                            Id = d.DiscussionId,
+                            Title = d.Title,
+                            CreatedAt = d.CreateDate,
+                            ImageFilename = d.ImageFilename
+                        })
+                        .ToList()
+                })
+                .FirstOrDefaultAsync();
+
+
             if (user == null)
             {
                 return NotFound();
             }
 
-            // Fetch user's discussion threads (assuming a relationship with Discussion)
-            var discussions = await _context.Discussion
-                                            .Where(d => d.ApplicationUserId == user.Id)
-                                            .OrderByDescending(d => d.CreateDate)
-                                            .ToListAsync();
-
-            // Create a ViewModel to hold both user and discussions
-            var profileViewModel = new ProfileViewModel
-            {
-                User = user,
-                Discussions = discussions
-            };
-
-            return View(profileViewModel);
+            return View(user);
         }
+
 
         public IActionResult Privacy()
         {

@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.EntityFrameworkCore;
 using MovieForum2.Data;
 
 namespace MovieForum2.Areas.Identity.Pages.Account.Manage
@@ -67,15 +68,14 @@ namespace MovieForum2.Areas.Identity.Pages.Account.Manage
             [Display(Name = "Location")]
             public string Location { get; set; }
             
-            [DataType(DataType.ImageUrl)]
-            [Display(Name = "ImageFile")]
+            [Display(Name = "Change Profile Picture")]
             public IFormFile ImageFile { get; set; }
 
             [Phone]
             [Display(Name = "Phone number")]
             public string PhoneNumber { get; set; }
 
-            public string ImageFilename { get; set; } = string.Empty;
+            public string ImageFilename { get; set; }
         }
 
         private async Task LoadAsync(ApplicationUser user)
@@ -92,11 +92,11 @@ namespace MovieForum2.Areas.Identity.Pages.Account.Manage
 
             Input = new InputModel
             {
-                Name = user.Name ?? string.Empty, // Avoid null values
-                Location = user.Location ?? string.Empty, // Avoid null values
-                ImageFilename = user.ImageFilename ?? string.Empty, // Avoid null values
-                ImageFile = user.ImageFile ?? null, // Prevent crash if ImageFile is null
-                PhoneNumber = phoneNumber ?? string.Empty // Avoid null values
+                Name = user.Name,
+                Location = user.Location,
+                ImageFilename = user.ImageFilename,
+
+                PhoneNumber = phoneNumber
             };
         }
 
@@ -109,18 +109,14 @@ namespace MovieForum2.Areas.Identity.Pages.Account.Manage
                 return NotFound($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
             }
 
-            if (user.ImageFile == null)
-            {
-                user.ImageFilename = string.Empty;
-            }
-
             await LoadAsync(user);
             return Page();
         }
 
         public async Task<IActionResult> OnPostAsync()
         {
-            var user = await _userManager.GetUserAsync(User);
+            var user = await _userManager.Users.FirstOrDefaultAsync(u => u.Id == _userManager.GetUserId(User));
+
             if (user == null)
             {
                 return NotFound($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");

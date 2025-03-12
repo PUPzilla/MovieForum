@@ -1,11 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using MovieForum2.Data;
 using MovieForum2.Models;
@@ -42,23 +39,30 @@ namespace MovieForum2.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(int discussionId, [Bind("Content")] Comment comment)
+        public async Task<IActionResult> Create(int DiscussionId, [Bind("Content")] Comment comment)
         {
-            var discussion = await _context.Discussion.FindAsync(discussionId);
+            var discussion = await _context.Discussion.FindAsync(DiscussionId);
             if (discussion == null)
             {
                 return NotFound();
             }
 
-            comment.DiscussionId = discussionId;
-            comment.ApplicationUserId = _userManager.GetUserId(User);
+            var user = await _userManager.GetUserAsync(User);
+            if (user == null)
+            {
+                return Unauthorized();
+            }
+
+            comment.DiscussionId = DiscussionId;
+            comment.ApplicationUserId = user.Id;
             comment.CreateDate = DateTime.Now;
 
-            _context.Add(comment);
+            _context.Comment.Add(comment);
             await _context.SaveChangesAsync();
 
-            return RedirectToAction("GetDiscussion", "Home", new { id = discussionId });
+            return RedirectToAction("GetDiscussion", "Home", new { id = DiscussionId });
         }
+
 
         private bool CommentExists(int id)
         {

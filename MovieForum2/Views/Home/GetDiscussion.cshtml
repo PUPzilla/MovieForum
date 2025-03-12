@@ -1,35 +1,55 @@
 ﻿@model MovieForum2.Models.Discussion
 
 @{
-    ViewData["Title"] = "GetDiscussion";
+    ViewData["Title"] = "Discussion - " + Model.Title;
 }
 
 <h1>@Model.Title</h1>
-<p>@Model.Content</p>
-<p>Discussion Created on: @Model.CreateDate</p>
 
-<a asp-controller="Comments" asp-action="Create" asp-route-DiscussionId="@Model.DiscussionId">Add Comment</a>
+<p>
+    <img src="@(string.IsNullOrEmpty(Model.ApplicationUser.ImageFilename)
+        ? "/images/placeholder/default-placeholder.png"
+        : $"/images/{Model.ApplicationUser.ImageFilename}")"
+         class="profile-picture" />
+
+    <a asp-area="Identity" asp-page="/Account/Manage/Index" asp-route-id="@Model.ApplicationUser.Id">@Model.ApplicationUser.Name</a>
+</p>
+
+<p>@Model.Content</p>
+<p><strong>Discussion Created on:</strong> @Model.CreateDate.ToString("MMMM dd, yyyy")</p>
+
+
+<a class="btn btn-primary" asp-controller="Comments" asp-action="Create" asp-route-DiscussionId="@Model.DiscussionId">
+    Add Comment
+</a>
 
 <h2>Comment Section</h2>
 
 @if (Model.Comments != null && Model.Comments.Any())
 {
-    <h2>@Model.Title</h2>
-    <p>@Model.Content</p>
-    <p>Created on: @Model.CreateDate</p>
-
     <h3>Comments:</h3>
-    @foreach (var comment in Model.Comments)
+    @foreach (var comment in Model.Comments.OrderBy(c => c.CreateDate))
     {
-        <div>
+        <div class="card my-2 p-2">
+            <div class="d-flex align-items-center">
+                <p>
+                    <img src="@(string.IsNullOrEmpty(comment.ApplicationUser.ImageFilename)
+                        ? "/images/placeholder/default-placeholder.png"
+                        : $"/images/{comment.ApplicationUser.ImageFilename}")"
+                         class="thumbnail" />
+
+                    <a asp-area="Identity" asp-page="/Account/Manage/Index" asp-route-id="@comment.ApplicationUserId">
+                        @comment.ApplicationUser.Name
+                    </a>
+                </p>
+            </div>
+
             <p>@comment.Content</p>
-            <p>Posted on: @comment.CreateDate</p>
+            <p class="text-muted small">Posted on: @comment.CreateDate.ToString("MMMM dd, yyyy - HH:mm")</p>
         </div>
     }
-
-    <a href="@Url.Action("Create", "Comments", new { discussionId = Model.DiscussionId })">Post a new comment</a>
 }
 else
 {
-    <p>It's quiet... Too quiet...<br />No comments have been made yet.<br />Be the start of the discussion and leave a comment!</p>
+    <p>It's quiet... Too quiet... No comments yet. Be the first to start the discussion!</p>
 }

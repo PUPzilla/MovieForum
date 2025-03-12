@@ -1,0 +1,51 @@
+﻿@model MovieForum2.Models.ProfileView
+
+@{
+    ViewData["Title"] = $"{Model.Name}'s Profile";
+}
+
+<h2>@Model.Name's Profile</h2>
+
+<div class="container p-3 mb-3">
+    <div class="row">
+        <div class="col-md-3">
+            @{
+                string imageUrl = string.IsNullOrEmpty(Model.ProfilePicture)
+                    ? Url.Content("/images/placeholder/default-placeholder.png")
+                    : Url.Content("/images/" + Model.ProfilePicture);}
+
+            <img src="@imageUrl"
+            class="profile-picture" alt="Profile Picture">
+        </div>
+        <div class="col-md-9">
+            <h4>@Model.Name</h4>
+            <p><strong>Location:</strong> @Model.Location</p>
+        </div>
+    </div>
+</div>
+
+<h3>Discussion Threads</h3>
+
+@if (Model.DiscussionThreads.Any())
+{
+    <ul class="list-group">
+        @foreach (var thread in Model.DiscussionThreads)
+        {
+            string discImage = string.IsNullOrEmpty(thread.ImageFilename)
+            ? Url.Content("/images/placeholder/default-placeholder.png")
+            : Url.Content("/images/" + thread.ImageFilename);
+
+            <li class="list-group-item">
+                <img src="@discImage" class="thumbnail" />
+                <a asp-controller="Home" asp-action="GetDiscussion" asp-route-id="@thread.Id">
+                    @thread.Title
+                </a>
+                <span class="text-muted">(@thread.CreatedAt.ToString("MMM dd, yyyy"))</span>
+            </li>
+        }
+    </ul>
+}
+else
+{
+    <p class="text-muted">No discussions yet.</p>
+}

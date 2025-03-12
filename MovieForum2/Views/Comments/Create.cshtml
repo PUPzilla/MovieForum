@@ -8,17 +8,16 @@
 
 <hr />
 <form asp-action="Create">
+    <input type="hidden" name="DiscussionId" value="@Model.DiscussionId" />
+
     <div class="form-group">
         <label asp-for="Content" class="control-label">Your Comment</label>
         <textarea class="form-control" id="Content" name="Content" required></textarea>
     </div>
+
     <button type="submit" class="btn btn-primary">Post</button>
 </form>
 
 <div>
     <a asp-controller="Home" asp-action="GetDiscussion" asp-route-id="@Model.DiscussionId">Back to Discussion</a>
 </div>
-
-@section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
-}

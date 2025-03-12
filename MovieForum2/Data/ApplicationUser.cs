@@ -1,5 +1,7 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
+﻿using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Http;
 using MovieForum2.Models;
 
 namespace MovieForum2.Data
@@ -19,7 +21,7 @@ namespace MovieForum2.Data
         [NotMapped]
         public IFormFile? ImageFile { get; set; }
 
-        // Navigation property for user discussions
-        public ICollection<Discussion> Discussions { get; set; } = new List<Discussion>();
+        // Navigation property for user's discussions
+        public virtual ICollection<Discussion> Discussions { get; set; } = new List<Discussion>();
     }
 }

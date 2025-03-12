@@ -30,6 +30,9 @@
             <div class="discussion-info">
                 <p class="text-center">Number of comments: @(item.Comments != null ? item.Comments.Count() : 0)</p>
                 <p class="text-center">Discussion created: @item.CreateDate</p>
+                <p class="text-center">
+                    Owner: <a href="@Url.Action("Profile", "Home", new { id = item.ApplicationUserId })">@item.ApplicationUser.Name</a>
+                </p>
             </div>
         </div>
     }
